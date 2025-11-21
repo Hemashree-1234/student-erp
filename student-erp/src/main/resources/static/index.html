@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Management System</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --danger-color: #e74c3c;
+            --light-grey: #f4f7f6;
+            --dark-grey: #333;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-grey);
+            color: var(--dark-grey);
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .nav {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: none;
+            border: 2px solid transparent;
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 4px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .view {
+            display: none; /* Hidden by default */
+        }
+        .view.active {
+            display: block; /* Shown when active */
+        }
+        h2, h3 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        form div {
+            display: flex;
+            flex-direction: column;
+        }
+        form label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        form input, form select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        form button {
+            grid-column: -2 / -1; /* Place in the last column */
+            align-self: end;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        form button:hover {
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: #ecf0f1;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .delete-btn {
+            padding: 5px 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            opacity: 0.9;
+        }
+        .status-paid {
+            color: green;
+            font-weight: bold;
+        }
+        .status-present {
+            color: green;
+            font-weight: bold;
+        }
+        .status-absent {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <h1>🎓 Education Management System</h1>
+    <nav class="nav" id="navigation">
+        <button class="nav-btn active" data-view="students">Students</button>
+        <button class="nav-btn" data-view="faculty">Faculty</button>
+        <button class="nav-btn" data-view="exams">Exams</button>
+        <button class="nav-btn" data-view="attendance">Attendance</button>
+        <button class="nav-btn" data-view="fees">Fees</button>
+    </nav>
+</header>
+
+<div class="container">
+
+    <main id="view-students" class="view active">
+        <h2>Student Management</h2>
+        <form id="add-student-form">
+            <div>
+                <label for="student-name">Name:</label>
+                <input type="text" id="student-name" required>
+            </div>
+            <div>
+                <label for="student-email">Email:</label>
+                <input type="email" id="student-email" required>
+            </div>
+            <div>
+                <label for="student-department">Department:</label>
+                <input type="text" id="student-department">
+            </div>
+            <div>
+                <label for="student-year">Year:</label>
+                <input type="number" id="student-year">
+            </div>
+            <button type="submit">Add Student</button>
+        </form>
+        <h3>All Students</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="student-list"></tbody>
+        </table>
+    </main>
+
+    <main id="view-faculty" class="view">
+        <h2>Faculty Management</h2>
+        <form id="add-faculty-form">
+            <div>
+                <label for="faculty-name">Name:</label>
+                <input type="text" id="faculty-name" required>
+            </div>
+            <div>
+                <label for="faculty-email">Email:</label>
+                <input type="email" id="faculty-email" required>
+            </div>
+            <div>
+                <label for="faculty-department">Department:</label>
+                <input type="text" id="faculty-department" required>
+            </div>
+            <div>
+                <label for="faculty-designation">Designation:</label>
+                <input type="text" id="faculty-designation">
+            </div>
+            <div>
+                <label for="faculty-salary">Salary:</label>
+                <input type="number" step="0.01" id="faculty-salary">
+            </div>
+            <button type="submit">Add Faculty</button>
+        </form>
+        <h3>All Faculty</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Salary</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="faculty-list"></tbody>
+        </table>
+    </main>
+
+    <main id="view-exams" class="view">
+        <h2>Exam Management</h2>
+        <form id="add-exam-form">
+            <div>
+                <label for="exam-student-id">Student:</label>
+                <select id="exam-student-id" required></select>
+            </div>
+            <div>
+                <label for="exam-subject">Subject:</label>
+                <input type="text" id="exam-subject" required>
+            </div>
+            <div>
+                <label for="exam-marks">Marks Ob:</label>
+                <input type="number" step="0.01" id="exam-marks" required>
+            </div>
+            <div>
+                <label for="exam-total">Total Marks:</label>
+                <input type="number" step="0.01" id="exam-total" required>
+            </div>
+            <button type="submit">Add Exam Result</button>
+        </form>
+        <h3>All Exam Results</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Exam ID</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Subject</th>
+                <th>Marks Ob.</th>
+                <th>Total Marks</th>
+                <th>Grade</th>
+            </tr>
+            </thead>
+            <tbody id="exam-list"></tbody>
+        </table>
+    </main>
+
+    <main id="view-attendance" class="view">
+        <h2>Attendance Management</h2>
+        <form id="mark-attendance-form">
+            <div>
+                <label for="att-student-id">Student:</label>
+                <select id="att-student-id" required></select>
+            </div>
+            <div>
+                <label>Status:</label>
+                <select id="att-status" required>
+                    <option value="true">Present</option>
+                    <option value="false">Absent</option>
+                </select>
+            </div>
+            <button type="submit">Mark Attendance</button>
+        </form>
+        <h3>All Attendance Records</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Att. ID</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody id="attendance-list"></tbody>
+        </table>
+    </main>
+
+    <main id="view-fees" class="view">
+        <h2>Fee Management</h2>
+        <form id="pay-fee-form">
+            <div>
+                <label for="fee-student-id">Student:</label>
+                <select id="fee-student-id" required></select>
+            </div>
+            <div>
+                <label for="fee-amount">Amount:</label>
+                <input type="number" step="0.01" id="fee-amount" required>
+            </div>
+            <button type="submit">Record Payment</button>
+        </form>
+        <h3>All Fee Records</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Fee ID</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Amount</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody id="fee-list"></tbody>
+        </table>
+    </main>
+
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8081/api';
+
+    // --- Global Navigation & Helper Functions ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set default view
+        showView('students');
+        loadStudents();
+
+        // Add navigation event listeners
+        document.getElementById('navigation').addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-btn')) {
+                const viewId = e.target.dataset.view;
+                showView(viewId);
+
+                // Update active button
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+            }
+        });
+
+        // Add form submit listeners
+        document.getElementById('add-student-form').addEventListener('submit', addStudent);
+        document.getElementById('add-faculty-form').addEventListener('submit', addFaculty);
+        document.getElementById('add-exam-form').addEventListener('submit', addExam);
+        document.getElementById('mark-attendance-form').addEventListener('submit', markAttendance);
+        document.getElementById('pay-fee-form').addEventListener('submit', payFee);
+
+        // Add table click listeners for delete buttons
+        document.getElementById('student-list').addEventListener('click', (e) => deleteRow(e, 'students', deleteStudent));
+        document.getElementById('faculty-list').addEventListener('click', (e) => deleteRow(e, 'faculty', deleteFaculty));
+    });
+
+    /**
+     * Shows the specified view and loads its data
+     * @param {string} viewId - The ID of the view to show (e.g., 'students')
+     */
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+        document.getElementById(view-${viewId}).classList.add('active');
+
+        // Load data for the view
+        switch (viewId) {
+            case 'students':
+                loadStudents();
+                break;
+            case 'faculty':
+                loadFaculty();
+                break;
+            case 'exams':
+                loadExams();
+                populateStudentDropdowns('exam-student-id');
+                break;
+            case 'attendance':
+                loadAttendance();
+                populateStudentDropdowns('att-student-id');
+                break;
+            case 'fees':
+                loadFees();
+                populateStudentDropdowns('fee-student-id');
+                break;
+        }
+    }
+
+    /**
+     * Populates a <select> dropdown with all students
+     * @param {string} selectId - The ID of the <select> element
+     */
+    async function populateStudentDropdowns(selectId) {
+        const select = document.getElementById(selectId);
+        // Don't re-populate if already full
+        if (select.options.length > 1) return;
+
+        select.innerHTML = '<option value="">Select a student...</option>';
+        try {
+            const response = await fetch(${API_BASE_URL}/students);
+            if (!response.ok) throw new Error('Failed to fetch students');
+            const students = await response.json();
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = ${student.name} (ID: ${student.id});
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error(Error populating students:, error);
+        }
+    }
+
+    /**
+     * Generic helper for handling delete button clicks
+     */
+    async function deleteRow(event, type, deleteFunction) {
+        if (event.target.classList.contains('delete-btn')) {
+            const id = event.target.dataset.id;
+            if (confirm(Are you sure you want to delete ${type} ID ${id}?)) {
+                await deleteFunction(id);
+            }
+        }
+    }
+
+    // --- Student Management ---
+
+    const studentList = document.getElementById('student-list');
+
+    async function loadStudents() {
+        try {
+            const response = await fetch(${API_BASE_URL}/students);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const students = await response.json();
+
+            studentList.innerHTML = '';
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.department}</td>
+                    <td>${student.year}</td>
+                    <td><button class="delete-btn" data-id="${student.id}">Delete</button></td>
+                `;
+                studentList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            studentList.innerHTML = '<tr><td colspan="6">Failed to load students.</td></tr>';
+        }
+    }
+
+    async function addStudent(event) {
+        event.preventDefault();
+        const student = {
+            name: document.getElementById('student-name').value,
+            email: document.getElementById('student-email').value,
+            department: document.getElementById('student-department').value,
+            year: parseInt(document.getElementById('student-year').value) || null,
+        };
+
+        try {
+            const response = await fetch(${API_BASE_URL}/students, {
+            method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(student),
+        });
+        if (response.ok) {
+            document.getElementById('add-student-form').reset();
+            loadStudents();
+        } else {
+            console.error('Failed to add student');
+        }
+    } catch (error) {
+        console.error('Error adding student:', error);
+    }
+    }
+
+    async function deleteStudent(id) {
+        try {
+            const response = await fetch(${API_BASE_URL}/students/${id}, { method: 'DELETE' });
+            if (response.ok) {
+                loadStudents();
+            } else {
+                console.error('Failed to delete student');
+            }
+        } catch (error) {
+            console.error('Error deleting student:', error);
+        }
+    }
+
+    // --- Faculty Management ---
+
+    const facultyList = document.getElementById('faculty-list');
+
+    async function loadFaculty() {
+        try {
+            const response = await fetch(${API_BASE_URL}/faculty);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const faculty = await response.json();
+
+            facultyList.innerHTML = '';
+            faculty.forEach(f => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${f.id}</td>
+                    <td>${f.name}</td>
+                    <td>${f.email}</td>
+                    <td>${f.department}</td>
+                    <td>${f.designation || 'N/A'}</td>
+                    <td>${f.salary ? $${f.salary.toFixed(2)} : 'N/A'}</td>
+                    <td><button class="delete-btn" data-id="${f.id}">Delete</button></td>
+                `;
+                facultyList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching faculty:', error);
+            facultyList.innerHTML = '<tr><td colspan="7">Failed to load faculty.</td></tr>';
+        }
+    }
+
+    async function addFaculty(event) {
+        event.preventDefault();
+        const faculty = {
+            name: document.getElementById('faculty-name').value,
+            email: document.getElementById('faculty-email').value,
+            department: document.getElementById('faculty-department').value,
+            designation: document.getElementById('faculty-designation').value,
+            salary: parseFloat(document.getElementById('faculty-salary').value) || null,
+        };
+
+        try {
+            const response = await fetch(${API_BASE_URL}/faculty, {
+            method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(faculty),
+        });
+        if (response.ok) {
+            document.getElementById('add-faculty-form').reset();
+            loadFaculty();
+        } else {
+            console.error('Failed to add faculty');
+        }
+    } catch (error) {
+        console.error('Error adding faculty:', error);
+    }
+    }
+
+    async function deleteFaculty(id) {
+        try {
+            const response = await fetch(${API_BASE_URL}/faculty/${id}, { method: 'DELETE' });
+            if (response.ok) {
+                loadFaculty();
+            } else {
+                console.error('Failed to delete faculty');
+            }
+        } catch (error) {
+            console.error('Error deleting faculty:', error);
+        }
+    }
+
+    // --- Exam Management ---
+
+    const examList = document.getElementById('exam-list');
+
+    async function loadExams() {
+        try {
+            const response = await fetch(${API_BASE_URL}/exams);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const exams = await response.json();
+
+            examList.innerHTML = '';
+            exams.forEach(exam => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${exam.id}</td>
+                    <td>${exam.student.id}</td>
+                    <td>${exam.student.name}</td>
+                    <td>${exam.subject}</td>
+                    <td>${exam.marksObtained}</td>
+                    <td>${exam.totalMarks}</td>
+                    <td>${exam.grade}</td>
+                `;
+                examList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+            examList.innerHTML = '<tr><td colspan="7">Failed to load exams.</td></tr>';
+        }
+    }
+
+    async function addExam(event) {
+        event.preventDefault();
+        const studentId = document.getElementById('exam-student-id').value;
+        const params = new URLSearchParams({
+            subject: document.getElementById('exam-subject').value,
+            marksObtained: document.getElementById('exam-marks').value,
+            totalMarks: document.getElementById('exam-total').value
+        });
+
+        try {
+            const response = await fetch(${API_BASE_URL}/exams/add/${studentId}?${params.toString()}, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                document.getElementById('add-exam-form').reset();
+                loadExams();
+            } else {
+                console.error('Failed to add exam');
+            }
+        } catch (error) {
+            console.error('Error adding exam:', error);
+        }
+    }
+
+    // --- Attendance Management ---
+
+    const attendanceList = document.getElementById('attendance-list');
+
+    async function loadAttendance() {
+        try {
+            const response = await fetch(${API_BASE_URL}/attendance);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const attendance = await response.json();
+
+            attendanceList.innerHTML = '';
+            attendance.forEach(att => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${att.id}</td>
+                    <td>${att.student.id}</td>
+                    <td>${att.student.name}</td>
+                    <td>${att.date}</td>
+                    <td>${att.present ? '<span class="status-present">Present</span>' : '<span class="status-absent">Absent</span>'}</td>
+                `;
+                attendanceList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching attendance:', error);
+            attendanceList.innerHTML = '<tr><td colspan="5">Failed to load attendance.</td></tr>';
+        }
+    }
+
+    async function markAttendance(event) {
+        event.preventDefault();
+        const studentId = document.getElementById('att-student-id').value;
+        const params = new URLSearchParams({
+            present: document.getElementById('att-status').value
+        });
+
+        try {
+            const response = await fetch(${API_BASE_URL}/attendance/mark/${studentId}?${params.toString()}, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                document.getElementById('mark-attendance-form').reset();
+                loadAttendance();
+            } else {
+                console.error('Failed to mark attendance');
+            }
+        } catch (error) {
+            console.error('Error marking attendance:', error);
+        }
+    }
+
+    // --- Fee Management ---
+
+    const feeList = document.getElementById('fee-list');
+
+    async function loadFees() {
+        try {
+            const response = await fetch(${API_BASE_URL}/fees);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const fees = await response.json();
+
+            feeList.innerHTML = '';
+            fees.forEach(fee => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${fee.id}</td>
+                    <td>${fee.student.id}</td>
+                    <td>${fee.student.name}</td>
+                    <td>$${fee.amount.toFixed(2)}</td>
+                    <td>${fee.paymentDate}</td>
+                    <td>${fee.paid ? '<span class="status-paid">Paid</span>' : 'Pending'}</td>
+                `;
+                feeList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching fees:', error);
+            feeList.innerHTML = '<tr><td colspan="6">Failed to load fees.</td></tr>';
+        }
+    }
+
+    async function payFee(event) {
+        event.preventDefault();
+        const studentId = document.getElementById('fee-student-id').value;
+        const params = new URLSearchParams({
+            amount: document.getElementById('fee-amount').value
+        });
+
+        try {
+            const response = await fetch(${API_BASE_URL}/fees/pay/${studentId}?${params.toString()}, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                document.getElementById('pay-fee-form').reset();
+                loadFees();
+            } else {
+                console.error('Failed to pay fee');
+            }
+        } catch (error) {
+            console.error('Error paying fee:', error);
+        }
+    }
+
+</script>
+
+</body>
+</html>
